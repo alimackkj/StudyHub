@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub - Gerenciar Cursos (CRUD)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="d-flex flex-column min-vh-100" style="background-color: #DAC9DF !important;">
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #6f42c1;">
+            <div class="container">
+                <a href="index.html" class="navbar-brand fw-bold">StudyHub</a>
+                <div id="menuNav" class="navbar-nav ms-auto d-flex flex-row gap-3"></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <div class="bg-white p-4 rounded shadow-sm mb-5">
+            <h3 class="fw-bold mb-4" style="color: #6f42c1;" id="tituloForm">Cadastrar Novo Curso</h3>
+            <form id="formCurso">
+                <input type="hidden" id="cursoId">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Nome do Curso</label>
+                        <input type="text" id="nomeCurso" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Professor</label>
+                        <input type="text" id="profCurso" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Carga Horária</label>
+                        <input type="text" id="cargaCurso" class="form-control" placeholder="Ex: 40 horas" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Descrição Curta</label>
+                        <input type="text" id="descCurta" class="form-control" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Descrição Completa</label>
+                        <textarea id="descLonga" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label fw-bold">URL da Imagem Principal</label>
+                        <input type="url" id="imgCurso" class="form-control" value="https://placehold.co/800x400/6f42c1/FFFFFF?text=Novo+Curso" required>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="destaqueCurso">
+                            <label class="form-check-label fw-bold" for="destaqueCurso">Colocar em Destaque</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn text-white fw-bold me-2" style="background-color: #6f42c1;">Salvar Curso</button>
+                        <button type="button" onclick="limparFormulario()" class="btn btn-outline-secondary">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white p-4 rounded shadow-sm">
+            <h3 class="fw-bold mb-4 text-dark">Lista de Cursos Cadastrados</h3>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Curso</th>
+                            <th>Professor</th>
+                            <th>Destaque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCursosCorpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-4 mt-auto">
+        <div class="container">
+            <h5 class="text-info mb-2">Sobre a Desenvolvedora</h5>
+            <p class="mb-0 text-secondary">Trabalho Prático - PUC Minas | Desenvolvido por: <a href="https://www.linkedin.com/in/camila-evangelista-34b737344/" target="_blank" class="text-white text-decoration-underline fw-bold">Camila Fernanda Evangelista</a></p>
+        </div>
+    </footer>
+
+    <script src="../assets/scripts/app.js"></script>
+    <script>
+        // Segurança: Bloquear acesso se não for Admin
+        const userLogado = getUsuarioLogado();
+        if(!userLogado || !userLogado.admin) {
+            alert("Acesso restrito apenas para administradores!");
+            window.location.href = "public/index.html";
+        }
+
+        const form = document.getElementById('formCurso');
+        
+        function carregarTabelaCRUD() {
+            const tbody = document.getElementById('tabelaCursosCorpo');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            const cursos = getCursos();
+
+            cursos.forEach(c => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td class="fw-bold">${c.nome}</td>
+                        <td>${c.professor}</td>
+                        <td>${c.destaque ? '<span class="badge bg-warning text-dark">Sim</span>' : '<span class="badge bg-secondary">Não</span>'}</td>
+                        <td>
+                            <button onclick="prepararEdicao(${c.id})" class="btn btn-sm btn-info me-1 text-white">Editar</button>
+                            <button onclick="deletarCurso(${c.id})" class="btn btn-sm btn-danger">Excluir</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const idVal = document.getElementById('cursoId').value;
+            let cursos = getCursos();
+
+            const cursoObjeto = {
+                id: idVal ? parseInt(idVal) : Date.now(),
+                nome: document.getElementById('nomeCurso').value,
+                professor: document.getElementById('profCurso').value,
+                carga_horaria: document.getElementById('cargaCurso').value,
+                descricao_curta: document.getElementById('descCurta').value,
+                descricao_longa: document.getElementById('descLonga').value,
+                imagem_principal: document.getElementById('imgCurso').value,
+                destaque: document.getElementById('destaqueCurso').checked,
+                modulos: idVal ? (cursos.find(c => c.id === parseInt(idVal))?.modulos || []) : [
+                    { "id": 1, "nome": "Introdução", "descricao": "Módulo básico inicial do curso.", "imagem": "https://placehold.co/400x300/20c997/FFFFFF?text=Modulo+Basico" }
+                ]
+            };
+
+            if(idVal) {
+                // Edição
+                cursos = cursos.map(c => c.id === parseInt(idVal) ? cursoObjeto : c);
+            } else {
+                // Criação
+                cursos.push(cursoObjeto);
+            }
+
+            localStorage.setItem('cursos', JSON.stringify(cursos));
+            limparFormulario();
+            carregarTabelaCRUD();
+            alert('Curso salvo com sucesso!');
+        });
+
+        function prepararEdicao(id) {
+            const cursos = getCursos();
+            const c = cursos.find(curso => curso.id === id);
+            if(!c) return;
+
+            document.getElementById('cursoId').value = c.id;
+            document.getElementById('nomeCurso').value = c.nome;
+            document.getElementById('profCurso').value = c.professor;
+            document.getElementById('cargaCurso').value = c.carga_horaria;
+            document.getElementById('descCurta').value = c.descricao_curta;
+            document.getElementById('descLonga').value = c.descricao_longa;
+            document.getElementById('imgCurso').value = c.imagem_principal;
+            document.getElementById('destaqueCurso').checked = c.destaque;
+
+            document.getElementById('tituloForm').innerText = "Editar Curso (ID: " + c.id + ")";
+        }
+
+        function deletarCurso(id) {
+            if(confirm("Tem certeza de que deseja excluir este curso?")) {
+                let cursos = getCursos();
+                cursos = cursos.filter(c => c.id !== id);
+                localStorage.setItem('cursos', JSON.stringify(cursos));
+                carregarTabelaCRUD();
+            }
+        }
+
+        function limparFormulario() {
+            form.reset();
+            document.getElementById('cursoId').value = "";
+            document.getElementById('tituloForm').innerText = "Cadastrar Novo Curso";
+        }
+
+        document.addEventListener("DOMContentLoaded", carregarTabelaCRUD);
+    </script>
+</body>
+</html>
