@@ -14,3 +14,54 @@
 body {
     background-color: #DAC9DF !important;
 }
+
+/* ===== Carrossel de destaques (responsivo) ===== */
+.destaque-item {
+    height: 400px;
+    background-color: #000;
+}
+
+.destaque-caption {
+    padding: 1rem;
+    left: 10%;
+    right: 10%;
+    bottom: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+    .destaque-item {
+        height: auto;
+        aspect-ratio: 2 / 1;
+        min-height: 200px;
+    }
+
+    .destaque-caption {
+        left: 12%;
+        right: 12%;
+        bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .destaque-caption h5 {
+        font-size: 1rem;
+        margin-bottom: 0.35rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .destaque-caption p {
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .destaque-caption .btn {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    #carouselDestaques .carousel-control-prev,
+    #carouselDestaques .carousel-control-next {
+        width: 10%;
+    }
+}
