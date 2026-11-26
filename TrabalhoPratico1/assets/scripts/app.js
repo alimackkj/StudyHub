@@ -130,7 +130,17 @@ function renderHome(filtroPesquisa = "") {
     // 1. Renderizar Carrossel (Destaques)
     if (carouselInner) {
         carouselInner.innerHTML = "";
-        const destaques = cursos.filter(c => c.destaque);
+        let destaques = cursos.filter(c => c.destaque);
+        // Se nenhum curso estiver marcado como destaque, mostra os primeiros cursos
+        if (destaques.length === 0) destaques = cursos.slice(0, 3);
+        if (destaques.length === 0) {
+            carouselInner.innerHTML = `
+                <div class="carousel-item active" style="height: 400px;">
+                    <div class="d-flex h-100 align-items-center justify-content-center bg-dark text-white">
+                        <p class="mb-0">Nenhum curso cadastrado ainda.</p>
+                    </div>
+                </div>`;
+        }
         destaques.forEach((curso, index) => {
             const activeClass = index === 0 ? 'active' : '';
             carouselInner.innerHTML += `

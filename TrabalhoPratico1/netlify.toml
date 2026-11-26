@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+
+# A Home fica em /public/index.html; a raiz do site leva para ela.
+[[redirects]]
+  from = "/"
+  to = "/public/index.html"
+  status = 301
