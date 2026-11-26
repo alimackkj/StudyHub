@@ -135,7 +135,7 @@ function renderHome(filtroPesquisa = "") {
         if (destaques.length === 0) destaques = cursos.slice(0, 3);
         if (destaques.length === 0) {
             carouselInner.innerHTML = `
-                <div class="carousel-item active" style="height: 400px;">
+                <div class="carousel-item destaque-item active">
                     <div class="d-flex h-100 align-items-center justify-content-center bg-dark text-white">
                         <p class="mb-0">Nenhum curso cadastrado ainda.</p>
                     </div>
@@ -144,11 +144,11 @@ function renderHome(filtroPesquisa = "") {
         destaques.forEach((curso, index) => {
             const activeClass = index === 0 ? 'active' : '';
             carouselInner.innerHTML += `
-                <div class="carousel-item ${activeClass}" style="height: 400px;">
+                <div class="carousel-item destaque-item ${activeClass}">
                     <img src="${curso.imagem_principal}" class="d-block w-100 h-100 object-cover" alt="${curso.nome}" style="opacity: 0.75; background-color: #000;">
-                    <div class="carousel-caption bg-dark bg-opacity-75 rounded p-3">
+                    <div class="carousel-caption destaque-caption bg-dark bg-opacity-75 rounded">
                         <h5>${curso.nome}</h5>
-                        <p>${curso.descricao_curta}</p>
+                        <p class="d-none d-sm-block">${curso.descricao_curta}</p>
                         <a href="detalhes.html?id=${curso.id}" class="btn btn-light btn-sm fw-bold">Ver Detalhes</a>
                     </div>
                 </div>`;
